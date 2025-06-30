@@ -43,7 +43,7 @@ const CategoryContent: React.FC<CategoryContentProps> = ({
     return (
       <div className='container mx-auto px-6 pb-8'>
         <div className='flex justify-between items-center mb-8'>
-          <h2 className='text-2xl font-bold text-white'>Items ({categoryItems.length})</h2>
+          <h2 className='text-2xl font-bold text-white pt-8'>Items ({categoryItems.length})</h2>
           {user && (
             <Button onClick={onAddItem} className='bg-blue-600 hover:bg-blue-700 text-white'>
               <Plus className='w-4 h-4 mr-2' />
