@@ -72,4 +72,10 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Hide Radix UI hidden select elements from accessibility checkers */
+  select[aria-hidden="true"] {
+    /* These are Radix UI's hidden select elements for accessibility */
+    /* They are intentionally hidden and don't need id/name attributes */
+  }
 }

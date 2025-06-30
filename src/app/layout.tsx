@@ -10,6 +10,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Star Wars Collectors",
   description: "Your ultimate Star Wars memorabilia collection management system",
+  icons: {
+    icon: "/vader.png",
+    shortcut: "/vader.png",
+    apple: "/vader.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

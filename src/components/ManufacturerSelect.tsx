@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useManufacturers } from "@/hooks/useManufacturers";
 import { ManufacturerInput } from "./ManufacturerInput";
@@ -7,15 +6,10 @@ import { ManufacturerDropdown } from "./ManufacturerDropdown";
 interface ManufacturerSelectProps {
   value: string;
   onChange: (val: string) => void;
-  initialManufacturers?: string[];
 }
 
-export default function ManufacturerSelect({
-  value,
-  onChange,
-  initialManufacturers = [],
-}: ManufacturerSelectProps) {
-  const { manufacturers, loading, setLoading, addManufacturer, editManufacturer } = useManufacturers();
+export default function ManufacturerSelect({ value, onChange }: ManufacturerSelectProps) {
+  const { manufacturers, loading, addManufacturer, editManufacturer } = useManufacturers();
   const [mode, setMode] = useState<"select" | "add" | "edit">("select");
   const [inputValue, setInputValue] = useState("");
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -25,7 +19,7 @@ export default function ManufacturerSelect({
 
     const manufacturerName = inputValue.trim();
     const success = addManufacturer(manufacturerName);
-    
+
     if (success) {
       onChange(manufacturerName);
       setInputValue("");
@@ -73,7 +67,7 @@ export default function ManufacturerSelect({
         onChange={setInputValue}
         onSave={handleAdd}
         onCancel={handleCancel}
-        placeholder="Manufacturer name"
+        placeholder='Manufacturer name'
         loading={loading}
       />
     );
@@ -86,7 +80,7 @@ export default function ManufacturerSelect({
         onChange={setInputValue}
         onSave={handleEdit}
         onCancel={handleCancel}
-        placeholder="Manufacturer name"
+        placeholder='Manufacturer name'
         loading={loading}
       />
     );

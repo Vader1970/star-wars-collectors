@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -111,7 +111,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
         try {
           const imageUrl = await uploadImageToCloudflare(file);
           return imageUrl;
-        } catch (error) {
+        } catch {
           toast({
             title: "Upload Error",
             description: `Failed to upload ${file.name}`,
@@ -131,7 +131,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
           description: `${successfulUploads.length} image(s) uploaded successfully`,
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Upload Error",
         description: "Failed to upload images",
@@ -168,7 +168,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
           title: "Processing Complete",
           description: "All images have been uploaded to cloud storage",
         });
-      } catch (error) {
+      } catch {
         toast({
           title: "Upload Error",
           description: "Some images failed to upload",
@@ -205,6 +205,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
       <DialogContent className='bg-white max-w-2xl max-h-[90vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle className='text-black'>{item ? "Edit Item" : "Add New Item"}</DialogTitle>
+          <DialogDescription className='sr-only'>Add Item</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4'>
@@ -214,6 +215,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
             </Label>
             <Input
               id='name'
+              name='name'
+              autoComplete='off'
               value={formData.name}
               onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
               required
@@ -231,12 +234,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                 setFormData((prev) => ({ ...prev, stockStatus: value }))
               }
             >
-              <SelectTrigger className='bg-white border-gray-300 text-black'>
+              <SelectTrigger id='stockStatus' name='stockStatus' className='bg-white border-gray-300 text-black'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className='bg-white'>
-                <SelectItem value='In Stock'>In Stock</SelectItem>
-                <SelectItem value='Out of Stock'>Out of Stock</SelectItem>
+                <SelectItem id='stock-in-stock' value='In Stock'>
+                  In Stock
+                </SelectItem>
+                <SelectItem id='stock-out-of-stock' value='Out of Stock'>
+                  Out of Stock
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -250,12 +257,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                 value={formData.rating}
                 onValueChange={(value) => setFormData((prev) => ({ ...prev, rating: value }))}
               >
-                <SelectTrigger className='bg-white border-gray-300 text-black' id='rating'>
+                <SelectTrigger className='bg-white border-gray-300 text-black' id='rating' name='rating'>
                   <SelectValue placeholder='Select rating' />
                 </SelectTrigger>
                 <SelectContent className='bg-white max-h-60 overflow-y-auto'>
                   {ratingOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
+                    <SelectItem key={option} id={`rating-${option}`} value={option}>
                       {option}
                     </SelectItem>
                   ))}
@@ -269,8 +276,10 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
               </Label>
               <Input
                 id='valuation'
+                name='valuation'
                 type='number'
                 step='0.01'
+                autoComplete='off'
                 value={formData.valuation}
                 onChange={(e) => setFormData((prev) => ({ ...prev, valuation: e.target.value }))}
                 className='bg-white border-gray-300 text-black'
@@ -284,8 +293,10 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
             </Label>
             <Input
               id='boughtFor'
+              name='boughtFor'
               type='number'
               step='0.01'
+              autoComplete='off'
               value={formData.boughtFor}
               onChange={(e) => setFormData((prev) => ({ ...prev, boughtFor: e.target.value }))}
               className='bg-white border-gray-300 text-black'
@@ -309,7 +320,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
               </Label>
               <Input
                 id='yearManufactured'
+                name='yearManufactured'
                 type='number'
+                autoComplete='off'
                 value={formData.yearManufactured}
                 onChange={(e) => setFormData((prev) => ({ ...prev, yearManufactured: e.target.value }))}
                 className='bg-white border-gray-300 text-black'
@@ -324,6 +337,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
               </Label>
               <Input
                 id='afaNumber'
+                name='afaNumber'
+                autoComplete='off'
                 value={formData.afaNumber}
                 onChange={(e) => setFormData((prev) => ({ ...prev, afaNumber: e.target.value }))}
                 className='bg-white border-gray-300 text-black'
@@ -343,13 +358,15 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                   }))
                 }
               >
-                <SelectTrigger className='bg-white border-gray-300 text-black' id='afaGrade'>
+                <SelectTrigger className='bg-white border-gray-300 text-black' id='afaGrade' name='afaGrade'>
                   <SelectValue placeholder='Select grade' />
                 </SelectTrigger>
                 <SelectContent className='bg-white max-h-60 overflow-y-auto'>
-                  <SelectItem value='none'>None</SelectItem>
+                  <SelectItem id='afa-grade-none' value='none'>
+                    None
+                  </SelectItem>
                   {afaGradeOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
+                    <SelectItem key={option} id={`afa-grade-${option}`} value={option}>
                       {option}
                     </SelectItem>
                   ))}
@@ -364,6 +381,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
             </Label>
             <Input
               id='variations'
+              name='variations'
+              autoComplete='off'
               value={formData.variations}
               onChange={(e) => setFormData((prev) => ({ ...prev, variations: e.target.value }))}
               className='bg-white border-gray-300 text-black'
@@ -371,7 +390,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
           </div>
 
           <div>
-            <Label className='text-black'>Images (Maximum 4)</Label>
+            <Label htmlFor='image-upload' className='text-black'>
+              Images (Maximum 4)
+            </Label>
             <div className='space-y-4 mt-2'>
               {/* Upload Button */}
               <div>
@@ -381,6 +402,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                   onChange={handleFileUpload}
                   className='hidden'
                   id='image-upload'
+                  name='images'
                   multiple
                   disabled={images.length >= 4 || uploading}
                 />
@@ -439,7 +461,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
               <div className='bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800'>
                 <p className='font-medium mb-1'>✅ Cloud Storage Active</p>
                 <p>
-                  Images are automatically uploaded to Cloudflare's global CDN for optimal performance and reliability.
+                  Images are automatically uploaded to Cloudflare&apos;s global CDN for optimal performance and
+                  reliability.
                 </p>
               </div>
             </div>
@@ -451,6 +474,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
             </Label>
             <Textarea
               id='description'
+              name='description'
+              autoComplete='off'
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               rows={3}

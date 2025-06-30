@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       return { data, error };
-    } catch (err) {
+    } catch {
       return {
         data: null,
         error: { message: "An unexpected error occurred during sign in" },
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       return { data, error };
-    } catch (err) {
+    } catch {
       return {
         data: null,
         error: { message: "An unexpected error occurred during sign up" },
@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setSession(null);
         setUser(null);
       }
-    } catch (err) {
+    } catch {
       // Clear local state even on error
       setSession(null);
       setUser(null);
