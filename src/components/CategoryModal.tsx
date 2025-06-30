@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,7 +31,6 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
     image: "",
     parentId: parentId || "",
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
@@ -38,7 +44,6 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
         parentId: category.parentId || parentId || "",
       });
       setImagePreview(category.image || "");
-      setImageFile(null);
     } else {
       setFormData({
         name: "",
@@ -47,7 +52,6 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
         parentId: parentId || "",
       });
       setImagePreview("");
-      setImageFile(null);
     }
   }, [category, parentId]);
 
@@ -63,7 +67,6 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
     };
     reader.readAsDataURL(file);
 
-    setImageFile(file);
     setIsUploading(true);
 
     try {
@@ -74,7 +77,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
         title: "Success",
         description: "Image uploaded successfully",
       });
-    } catch (error) {
+    } catch {
       // Handle upload error
     } finally {
       setIsUploading(false);
@@ -82,7 +85,6 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
   };
 
   const removeImage = () => {
-    setImageFile(null);
     setImagePreview("");
     setFormData((prev) => ({ ...prev, image: "" }));
   };
@@ -99,7 +101,6 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
     });
 
     setFormData({ name: "", description: "", image: "", parentId: "" });
-    setImageFile(null);
     setImagePreview("");
     onClose();
   };
@@ -111,6 +112,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
           <DialogTitle className='text-xl font-bold text-blue-400'>
             {category ? "Edit Category" : "Add New Category"}
           </DialogTitle>
+          <DialogDescription className='sr-only'>Add Category</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4'>
@@ -120,6 +122,8 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
             </Label>
             <Input
               id='name'
+              name='name'
+              autoComplete='off'
               value={formData.name}
               onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
               className='bg-slate-800 border-slate-600 text-white focus:border-blue-500'
@@ -134,6 +138,8 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
             </Label>
             <Textarea
               id='description'
+              name='description'
+              autoComplete='off'
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               className='bg-slate-800 border-slate-600 text-white focus:border-blue-500 resize-none'
@@ -177,6 +183,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
                     disabled={isUploading}
                     className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
                     id='image-upload'
+                    name='image'
                   />
                   <Button
                     type='button'

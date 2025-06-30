@@ -1,8 +1,7 @@
-
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Check, X } from 'lucide-react';
+import React from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 
 interface ManufacturerInputProps {
   value: string;
@@ -19,7 +18,7 @@ export const ManufacturerInput: React.FC<ManufacturerInputProps> = ({
   onSave,
   onCancel,
   placeholder,
-  loading
+  loading,
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && value.trim() && !loading) {
@@ -31,32 +30,24 @@ export const ManufacturerInput: React.FC<ManufacturerInputProps> = ({
   };
 
   return (
-    <div className="flex gap-2 items-center mt-1">
+    <div className='flex gap-2 items-center mt-1'>
       <Input
+        id='manufacturer-input'
+        name='manufacturer-input'
+        autoComplete='off'
         autoFocus
         value={value}
         placeholder={placeholder}
-        className="flex-1 bg-white border-gray-300 text-black"
-        onChange={e => onChange(e.target.value)}
+        className='flex-1 bg-white border-gray-300 text-black'
+        onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         disabled={loading}
       />
-      <Button
-        type="button"
-        className="px-2"
-        disabled={!value.trim() || loading}
-        onClick={onSave}
-      >
-        <Check className="w-4 h-4" />
+      <Button type='button' className='px-2' disabled={!value.trim() || loading} onClick={onSave}>
+        <Check className='w-4 h-4' />
       </Button>
-      <Button
-        type="button"
-        className="px-2"
-        variant="ghost"
-        onClick={onCancel}
-        disabled={loading}
-      >
-        <X className="w-4 h-4" />
+      <Button type='button' className='px-2' variant='ghost' onClick={onCancel} disabled={loading}>
+        <X className='w-4 h-4' />
       </Button>
     </div>
   );

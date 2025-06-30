@@ -27,7 +27,7 @@ const HeroEditModal: React.FC<HeroEditModalProps> = ({ isOpen, onClose }) => {
         description: "Your changes have been saved to the database.",
       });
       onClose();
-    } catch (error) {
+    } catch {
       // Handle error silently
     } finally {
       setSaving(false);
