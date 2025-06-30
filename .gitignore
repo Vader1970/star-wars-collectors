@@ -13,8 +13,8 @@ dist-ssr
 *.local
 
 # Next.js
-.next
-next-env.d.ts
+# .next
+# next-env.d.ts
 
 # Editor directories and files
 .vscode/*
