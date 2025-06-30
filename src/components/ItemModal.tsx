@@ -444,6 +444,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                         onClick={() => removeImage(index)}
                         className='absolute top-1 right-1 bg-red-600/90 border-red-500 text-white hover:bg-red-700 w-6 h-6 p-0'
                         disabled={uploading}
+                        aria-label={`Remove image ${index + 1}`}
                       >
                         <X className='w-3 h-3' />
                       </Button>
