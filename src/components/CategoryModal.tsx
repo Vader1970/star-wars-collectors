@@ -170,6 +170,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
                     onClick={removeImage}
                     disabled={isUploading}
                     className='absolute top-2 right-2 bg-red-600/80 border-red-500 text-white hover:bg-red-700'
+                    aria-label='Remove image'
                   >
                     <X className='w-4 h-4' />
                   </Button>
