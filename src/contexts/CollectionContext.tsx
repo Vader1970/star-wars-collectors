@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Category, Item, CollectionContextType } from "../types";
 import { useToast } from "@/hooks/use-toast";
@@ -21,31 +21,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
     deleteItemWithAuth,
   } = useCollectionOperations();
 
-  // Helper function to generate simple filename for manual saving
-  const generateFileName = (itemName: string, imageIndex: number): string => {
-    const sanitizedName = itemName.toLowerCase().replace(/[^a-z0-9]/g, "-");
-    const timestamp = Date.now();
-    return `${sanitizedName}-${imageIndex}-${timestamp}.jpg`;
-  };
-
-  // Helper function to download image for manual saving
-  const downloadImageForManualSave = (imageData: string, fileName: string) => {
-    const link = document.createElement("a");
-    link.href = imageData;
-    link.download = fileName;
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // Load data from Supabase on mount
-  useEffect(() => {
-    loadCategories();
-    loadItems();
-  }, []);
-
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const { data, error } = await supabase.from("categories").select("*").order("created_at", { ascending: true });
 
@@ -62,16 +38,16 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
       }));
 
       setCategories(formattedCategories);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to load categories",
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       const { data, error } = await supabase.from("items").select("*").order("created_at", { ascending: true });
 
@@ -98,14 +74,20 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
       }));
 
       setItems(formattedItems);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to load items",
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
+
+  // Load data from Supabase on mount
+  useEffect(() => {
+    loadCategories();
+    loadItems();
+  }, [loadCategories, loadItems]);
 
   const addCategory = async (categoryData: Omit<Category, "id" | "createdAt" | "updatedAt">) => {
     try {
@@ -127,7 +109,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         title: "Success",
         description: "Category created successfully",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to create category",
@@ -156,7 +138,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         title: "Success",
         description: "Category updated successfully",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update category",
@@ -176,7 +158,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         title: "Success",
         description: "Category deleted successfully",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete category",
@@ -215,7 +197,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         title: "Success",
         description: "Item created successfully",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to create item",
@@ -254,7 +236,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         title: "Success",
         description: "Item updated successfully",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update item",
@@ -273,7 +255,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         title: "Success",
         description: "Item deleted successfully",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete item",
