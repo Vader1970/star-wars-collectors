@@ -19,7 +19,6 @@ export default function CategoryPage() {
 
   const categoryId = params?.categoryId as string;
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
-  const [showItems, setShowItems] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -114,7 +113,7 @@ export default function CategoryPage() {
   }
 
   return (
-    <div>
+    <div className='bg-slate-900 min-h-screen'>
       <CategoryHeader
         currentCategory={currentCategory}
         onBackNavigation={handleBackNavigation}
@@ -122,7 +121,6 @@ export default function CategoryPage() {
       />
 
       <CategoryContent
-        showItems={showItems}
         user={user}
         subcategories={subcategories}
         categoryItems={categoryItems}

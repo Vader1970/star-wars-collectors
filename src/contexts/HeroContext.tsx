@@ -58,7 +58,7 @@ export const HeroProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // No data exists, use defaults
         setHeroSettings(defaultHeroSettings);
       }
-    } catch (error) {
+    } catch {
       setHeroSettings(defaultHeroSettings);
     } finally {
       setLoading(false);

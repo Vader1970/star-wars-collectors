@@ -11,7 +11,6 @@ interface User {
 }
 
 interface CategoryContentProps {
-  showItems: boolean;
   user: User | null;
   subcategories: Category[];
   categoryItems: Item[];
@@ -26,7 +25,6 @@ interface CategoryContentProps {
 }
 
 const CategoryContent: React.FC<CategoryContentProps> = ({
-  showItems,
   user,
   subcategories,
   categoryItems,

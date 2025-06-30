@@ -21,7 +21,7 @@ export const useManufacturers = () => {
       const uniqueManufacturers = [...new Set(data.map((item) => item.manufacturer).filter(Boolean))].sort();
 
       setManufacturers(uniqueManufacturers);
-    } catch (error) {
+    } catch {
       setError("Failed to load manufacturers");
     }
   };

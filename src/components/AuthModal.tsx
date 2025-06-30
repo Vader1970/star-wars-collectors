@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,7 +75,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
         onOpenChange(false);
         setFormData({ email: "", password: "" });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -91,6 +91,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
       <DialogContent className='bg-slate-900 border-slate-700 text-white max-w-md'>
         <DialogHeader>
           <DialogTitle className='text-white text-center'>Sign In</DialogTitle>
+          <DialogDescription className='sr-only'>
+            Sign in to your Star Wars Collectors account to access your collection and wishlist.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4'>

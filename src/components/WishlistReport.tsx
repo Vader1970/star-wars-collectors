@@ -1,5 +1,5 @@
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useCollection } from "@/contexts/CollectionContext";
@@ -41,6 +41,7 @@ const WishlistReport: React.FC<WishlistReportProps> = ({ open, onClose }) => {
     <Dialog open={open} onOpenChange={(state) => !state && onClose()}>
       <DialogContent className='max-w-4xl bg-white border border-slate-300'>
         <DialogHeader>
+          <DialogDescription className='sr-only'>Wishlist Report</DialogDescription>
           <DialogTitle className='text-2xl font-bold flex flex-row items-center justify-between'>
             <span>
               Wishlist Report
