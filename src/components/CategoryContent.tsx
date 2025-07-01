@@ -42,8 +42,8 @@ const CategoryContent: React.FC<CategoryContentProps> = ({
   if (shouldShowItems) {
     return (
       <div className='container mx-auto px-6 pb-8'>
-        <div className='flex justify-between items-center mb-8'>
-          <h2 className='text-2xl font-bold text-white pt-8'>Items ({categoryItems.length})</h2>
+        <div className='flex justify-between items-center mb-8 pt-8'>
+          <h2 className='text-2xl font-bold text-white'>Items ({categoryItems.length})</h2>
           {user && (
             <Button onClick={onAddItem} className='bg-blue-600 hover:bg-blue-700 text-white'>
               <Plus className='w-4 h-4 mr-2' />
@@ -88,7 +88,7 @@ const CategoryContent: React.FC<CategoryContentProps> = ({
 
   // Show subcategories
   return (
-    <div className='container mx-auto px-6 pb-8'>
+    <div className='container mx-auto px-6 py-8'>
       <div className='flex justify-end items-center gap-3 mb-8'>
         {user && (
           <>
