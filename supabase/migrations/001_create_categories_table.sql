@@ -1,4 +1,3 @@
-
 -- Create manufacturers table
 CREATE TABLE manufacturers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
