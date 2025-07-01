@@ -10,6 +10,7 @@ CREATE TABLE categories (
   name TEXT NOT NULL,
   description TEXT,
   image TEXT,
+  cloudflare_id TEXT, -- Cloudflare image ID for automatic deletion
   parent_id UUID REFERENCES categories(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -25,7 +26,9 @@ CREATE TABLE items (
   rating TEXT,
   valuation DECIMAL,
   image TEXT,
+  cloudflare_id TEXT, -- Cloudflare image ID for main image
   images TEXT[], -- Added images column for multiple images
+  cloudflare_ids TEXT[], -- Cloudflare image IDs for multiple images
   manufacturer TEXT,
   year_manufactured INTEGER,
   afa_number TEXT,
@@ -52,10 +55,12 @@ CREATE TABLE hero_settings (
 -- Create indexes for better performance
 CREATE INDEX idx_categories_parent_id ON categories(parent_id);
 CREATE INDEX idx_categories_user_id ON categories(user_id);
+CREATE INDEX idx_categories_cloudflare_id ON categories(cloudflare_id);
 CREATE INDEX idx_categories_created_at_asc ON categories(created_at ASC);
 CREATE INDEX idx_categories_user_created ON categories(user_id, created_at DESC);
 CREATE INDEX idx_items_category_id ON items(category_id);
 CREATE INDEX idx_items_user_id ON items(user_id);
+CREATE INDEX idx_items_cloudflare_id ON items(cloudflare_id);
 CREATE INDEX idx_items_user_created ON items(user_id, created_at DESC);
 CREATE INDEX idx_hero_settings_user_id ON hero_settings(user_id);
 CREATE INDEX idx_hero_settings_user_created ON hero_settings(user_id, created_at DESC);

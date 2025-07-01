@@ -1,12 +1,14 @@
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../integrations/supabase/client";
 import { Category, Item } from "../types";
+import { deleteImageFromCloudflare } from "../services/cloudflareImages";
 
 interface CategoryDbUpdates {
   updated_at: string;
   name?: string;
   description?: string;
   image?: string;
+  cloudflare_id?: string;
   parent_id?: string | null;
 }
 
@@ -18,7 +20,9 @@ interface ItemDbUpdates {
   rating?: string;
   valuation?: number;
   image?: string;
+  cloudflare_id?: string;
   images?: string[];
+  cloudflare_ids?: string[];
   manufacturer?: string;
   year_manufactured?: number;
   afa_number?: string;
@@ -43,6 +47,7 @@ export const useCollectionOperations = () => {
           name: categoryData.name,
           description: categoryData.description,
           image: categoryData.image,
+          cloudflare_id: categoryData.cloudflareId, // Add cloudflare_id
           parent_id: categoryData.parentId, // Map parentId to parent_id
           user_id: user.id,
         },
@@ -70,6 +75,7 @@ export const useCollectionOperations = () => {
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.description !== undefined) dbUpdates.description = updates.description;
     if (updates.image !== undefined) dbUpdates.image = updates.image;
+    if (updates.cloudflareId !== undefined) dbUpdates.cloudflare_id = updates.cloudflareId;
     if (updates.parentId !== undefined) dbUpdates.parent_id = updates.parentId;
 
     const { data, error } = await supabase
@@ -92,10 +98,24 @@ export const useCollectionOperations = () => {
       throw new Error("User must be authenticated to delete categories");
     }
 
+    // First, get the category to find its cloudflare_id
+    const { data: category } = await supabase
+      .from("categories")
+      .select("cloudflare_id")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+
+    // Delete the category from database
     const { error } = await supabase.from("categories").delete().eq("id", id).eq("user_id", user.id);
 
     if (error) {
       throw error;
+    }
+
+    // Delete the image from Cloudflare if it exists
+    if (category?.cloudflare_id) {
+      await deleteImageFromCloudflare(category.cloudflare_id);
     }
   };
 
@@ -114,7 +134,9 @@ export const useCollectionOperations = () => {
           rating: itemData.rating,
           valuation: itemData.valuation,
           image: itemData.image,
+          cloudflare_id: itemData.cloudflareId, // Add cloudflare_id
           images: itemData.images,
+          cloudflare_ids: itemData.cloudflareIds, // Add cloudflare_ids
           manufacturer: itemData.manufacturer,
           year_manufactured: itemData.yearManufactured, // Map yearManufactured to year_manufactured
           afa_number: itemData.afaNumber, // Map afaNumber to afa_number
@@ -151,7 +173,9 @@ export const useCollectionOperations = () => {
     if (updates.rating !== undefined) dbUpdates.rating = updates.rating;
     if (updates.valuation !== undefined) dbUpdates.valuation = updates.valuation;
     if (updates.image !== undefined) dbUpdates.image = updates.image;
+    if (updates.cloudflareId !== undefined) dbUpdates.cloudflare_id = updates.cloudflareId;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
+    if (updates.cloudflareIds !== undefined) dbUpdates.cloudflare_ids = updates.cloudflareIds;
     if (updates.manufacturer !== undefined) dbUpdates.manufacturer = updates.manufacturer;
     if (updates.yearManufactured !== undefined) dbUpdates.year_manufactured = updates.yearManufactured;
     if (updates.afaNumber !== undefined) dbUpdates.afa_number = updates.afaNumber;
@@ -180,10 +204,34 @@ export const useCollectionOperations = () => {
       throw new Error("User must be authenticated to delete items");
     }
 
+    // First, get the item to find its cloudflare IDs
+    const { data: item } = await supabase
+      .from("items")
+      .select("cloudflare_id, cloudflare_ids")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+
+    // Delete the item from database
     const { error } = await supabase.from("items").delete().eq("id", id).eq("user_id", user.id);
 
     if (error) {
       throw error;
+    }
+
+    // Delete images from Cloudflare if they exist
+    if (item) {
+      // Delete main image
+      if (item.cloudflare_id) {
+        await deleteImageFromCloudflare(item.cloudflare_id);
+      }
+
+      // Delete multiple images
+      if (item.cloudflare_ids && item.cloudflare_ids.length > 0) {
+        for (const cloudflareId of item.cloudflare_ids) {
+          await deleteImageFromCloudflare(cloudflareId);
+        }
+      }
     }
   };
 

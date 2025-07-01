@@ -29,6 +29,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
     name: "",
     description: "",
     image: "",
+    cloudflareId: "",
     parentId: parentId || "",
   });
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -41,6 +42,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
         name: category.name,
         description: category.description || "",
         image: category.image || "",
+        cloudflareId: category.cloudflareId || "",
         parentId: category.parentId || parentId || "",
       });
       setImagePreview(category.image || "");
@@ -49,6 +51,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
         name: "",
         description: "",
         image: "",
+        cloudflareId: "",
         parentId: parentId || "",
       });
       setImagePreview("");
@@ -70,8 +73,12 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
     setIsUploading(true);
 
     try {
-      const cloudflareUrl = await uploadImageToCloudflare(file);
-      setFormData((prev) => ({ ...prev, image: cloudflareUrl }));
+      const { imageUrl, cloudflareId } = await uploadImageToCloudflare(file);
+      setFormData((prev) => ({
+        ...prev,
+        image: imageUrl,
+        cloudflareId: cloudflareId,
+      }));
 
       toast({
         title: "Success",
@@ -97,10 +104,11 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
       name: formData.name.trim(),
       description: formData.description.trim() || undefined,
       image: formData.image || undefined,
+      cloudflareId: formData.cloudflareId || undefined,
       parentId: formData.parentId || undefined,
     });
 
-    setFormData({ name: "", description: "", image: "", parentId: "" });
+    setFormData({ name: "", description: "", image: "", cloudflareId: "", parentId: "" });
     setImagePreview("");
     onClose();
   };

@@ -7,7 +7,13 @@ export interface CloudflareUploadResponse {
   error?: string;
 }
 
-export const uploadImageToCloudflare = async (file: File): Promise<string> => {
+export interface CloudflareDeleteResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+export const uploadImageToCloudflare = async (file: File): Promise<{ imageUrl: string; cloudflareId: string }> => {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -27,7 +33,36 @@ export const uploadImageToCloudflare = async (file: File): Promise<string> => {
     throw new Error("Failed to upload image");
   }
 
-  return data.imageUrl;
+  return {
+    imageUrl: data.imageUrl,
+    cloudflareId: data.cloudflareId,
+  };
+};
+
+export const deleteImageFromCloudflare = async (cloudflareId: string): Promise<void> => {
+  if (!cloudflareId) {
+    return; // No image to delete
+  }
+
+  try {
+    const { data, error } = await supabase.functions.invoke("delete-from-cloudflare", {
+      body: { imageId: cloudflareId },
+    });
+
+    if (error) {
+      console.error("Failed to delete image from Cloudflare:", error);
+      // Don't throw error to avoid breaking the main operation
+      return;
+    }
+
+    if (!data.success) {
+      console.error("Failed to delete image from Cloudflare:", data.error);
+      return;
+    }
+  } catch (error) {
+    console.error("Error deleting image from Cloudflare:", error);
+    // Don't throw error to avoid breaking the main operation
+  }
 };
 
 export const convertBase64ToFile = (base64String: string, filename: string): File => {
