@@ -23,7 +23,13 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 
   const loadCategories = useCallback(async () => {
     try {
-      const { data, error } = await supabase.from("categories").select("*").order("created_at", { ascending: true });
+      // Only select the columns we actually need
+      // Add pagination for better performance with large datasets
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, description, image, parent_id, created_at, updated_at")
+        .order("created_at", { ascending: true })
+        .limit(1000); // Limit to prevent massive queries
 
       if (error) throw error;
 
@@ -49,7 +55,13 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 
   const loadItems = useCallback(async () => {
     try {
-      const { data, error } = await supabase.from("items").select("*").order("created_at", { ascending: true });
+      // Only select the columns we actually need
+      const { data, error } = await supabase
+        .from("items")
+        .select(
+          "id, name, category_id, stock_status, rating, valuation, image, images, manufacturer, year_manufactured, afa_number, afa_grade, description, bought_for, variations, created_at, updated_at"
+        )
+        .order("created_at", { ascending: true });
 
       if (error) throw error;
 
