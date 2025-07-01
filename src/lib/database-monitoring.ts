@@ -1,5 +1,4 @@
 // Database monitoring utilities for performance tracking
-import { supabase } from "@/integrations/supabase/client";
 
 export interface QueryMetrics {
   query: string;
@@ -7,6 +6,11 @@ export interface QueryMetrics {
   timestamp: Date;
   success: boolean;
   error?: string;
+}
+
+interface SupabaseResponse<T> {
+  data: T | null;
+  error: Error | null;
 }
 
 class DatabaseMonitor {
@@ -78,12 +82,13 @@ export const dbMonitor = new DatabaseMonitor();
 // Wrapper for Supabase queries
 export async function monitoredQuery<T>(
   queryName: string,
-  queryFn: () => Promise<{ data: T | null; error: any }>
-): Promise<{ data: T | null; error: any }> {
+  queryFn: () => Promise<SupabaseResponse<T>>
+): Promise<SupabaseResponse<T>> {
   return dbMonitor.trackQuery(queryName, queryFn);
 }
 
 // Example usage:
+// import { supabase } from "@/integrations/supabase/client";
 // const { data, error } = await monitoredQuery(
 //   'loadCategories',
 //   () => supabase.from('categories').select('*')
