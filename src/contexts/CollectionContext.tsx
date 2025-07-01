@@ -27,7 +27,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
       // Add pagination for better performance with large datasets
       const { data, error } = await supabase
         .from("categories")
-        .select("id, name, description, image, parent_id, created_at, updated_at")
+        .select("id, name, description, image, cloudflare_id, parent_id, created_at, updated_at")
         .order("created_at", { ascending: true })
         .limit(1000); // Limit to prevent massive queries
 
@@ -38,6 +38,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         name: cat.name,
         description: cat.description,
         image: cat.image,
+        cloudflareId: cat.cloudflare_id,
         parentId: cat.parent_id,
         createdAt: new Date(cat.created_at),
         updatedAt: new Date(cat.updated_at),
@@ -59,7 +60,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase
         .from("items")
         .select(
-          "id, name, category_id, stock_status, rating, valuation, image, images, manufacturer, year_manufactured, afa_number, afa_grade, description, bought_for, variations, created_at, updated_at"
+          "id, name, category_id, stock_status, rating, valuation, image, cloudflare_id, images, cloudflare_ids, manufacturer, year_manufactured, afa_number, afa_grade, description, bought_for, variations, created_at, updated_at"
         )
         .order("created_at", { ascending: true });
 
@@ -73,7 +74,9 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         rating: item.rating,
         valuation: item.valuation,
         image: item.image,
+        cloudflareId: item.cloudflare_id,
         images: item.images,
+        cloudflareIds: item.cloudflare_ids,
         manufacturer: item.manufacturer,
         yearManufactured: item.year_manufactured,
         afaNumber: item.afa_number,
@@ -110,6 +113,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         name: newCategory.name,
         description: newCategory.description,
         image: newCategory.image,
+        cloudflareId: newCategory.cloudflare_id,
         parentId: newCategory.parent_id,
         createdAt: new Date(newCategory.created_at),
         updatedAt: new Date(newCategory.updated_at),
@@ -139,6 +143,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         name: updatedData.name,
         description: updatedData.description,
         image: updatedData.image,
+        cloudflareId: updatedData.cloudflare_id,
         parentId: updatedData.parent_id,
         createdAt: new Date(updatedData.created_at),
         updatedAt: new Date(updatedData.updated_at),
@@ -191,7 +196,9 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         rating: newItemData.rating,
         valuation: newItemData.valuation,
         image: newItemData.image,
+        cloudflareId: newItemData.cloudflare_id,
         images: newItemData.images,
+        cloudflareIds: newItemData.cloudflare_ids,
         manufacturer: newItemData.manufacturer,
         yearManufactured: newItemData.year_manufactured,
         afaNumber: newItemData.afa_number,
@@ -230,7 +237,9 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
         rating: updatedData.rating,
         valuation: updatedData.valuation,
         image: updatedData.image,
+        cloudflareId: updatedData.cloudflare_id,
         images: updatedData.images,
+        cloudflareIds: updatedData.cloudflare_ids,
         manufacturer: updatedData.manufacturer,
         yearManufactured: updatedData.year_manufactured,
         afaNumber: updatedData.afa_number,

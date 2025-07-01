@@ -3,6 +3,7 @@ export interface Category {
   name: string;
   description?: string;
   image?: string;
+  cloudflareId?: string;
   parentId?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -16,7 +17,9 @@ export interface Item {
   rating?: string;
   valuation?: number;
   image?: string;
+  cloudflareId?: string;
   images?: string[]; // New field for multiple images
+  cloudflareIds?: string[]; // Cloudflare IDs for multiple images
   manufacturer?: string;
   yearManufactured?: number;
   afaNumber?: string;

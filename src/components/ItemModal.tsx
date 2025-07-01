@@ -42,6 +42,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
   });
 
   const [images, setImages] = useState<string[]>([]);
+  const [cloudflareIds, setCloudflareIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
@@ -69,6 +70,15 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
       } else {
         setImages([]);
       }
+
+      // Handle existing Cloudflare IDs
+      if (item.cloudflareIds && item.cloudflareIds.length > 0) {
+        setCloudflareIds(item.cloudflareIds);
+      } else if (item.cloudflareId) {
+        setCloudflareIds([item.cloudflareId]);
+      } else {
+        setCloudflareIds([]);
+      }
     } else {
       setFormData({
         name: "",
@@ -84,6 +94,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
         variations: "",
       });
       setImages([]);
+      setCloudflareIds([]);
     }
   }, [item]);
 
@@ -109,8 +120,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
     try {
       const uploadPromises = filesToProcess.map(async (file) => {
         try {
-          const imageUrl = await uploadImageToCloudflare(file);
-          return imageUrl;
+          const { imageUrl, cloudflareId } = await uploadImageToCloudflare(file);
+          return { imageUrl, cloudflareId };
         } catch {
           toast({
             title: "Upload Error",
@@ -121,11 +132,20 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
         }
       });
 
-      const uploadedUrls = await Promise.all(uploadPromises);
-      const successfulUploads = uploadedUrls.filter((url) => url !== null) as string[];
+      const uploadedResults = await Promise.all(uploadPromises);
+      const successfulUploads = uploadedResults.filter((result) => result !== null) as {
+        imageUrl: string;
+        cloudflareId: string;
+      }[];
 
       if (successfulUploads.length > 0) {
-        setImages((prev) => [...prev, ...successfulUploads]);
+        const imageUrls = successfulUploads.map((result) => result.imageUrl);
+        setImages((prev) => [...prev, ...imageUrls]);
+
+        // Store Cloudflare IDs for later use
+        const cloudflareIds = successfulUploads.map((result) => result.cloudflareId);
+        setCloudflareIds((prev) => [...prev, ...cloudflareIds]);
+
         toast({
           title: "Upload Successful",
           description: `${successfulUploads.length} image(s) uploaded successfully`,
@@ -158,11 +178,17 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
       try {
         const uploadPromises = base64Images.map(async (base64, index) => {
           const file = convertBase64ToFile(base64, `${formData.name}-${index}.jpg`);
-          return await uploadImageToCloudflare(file);
+          const { imageUrl, cloudflareId } = await uploadImageToCloudflare(file);
+          return { imageUrl, cloudflareId };
         });
 
-        const uploadedUrls = await Promise.all(uploadPromises);
-        finalImages = [...finalImages, ...uploadedUrls];
+        const uploadedResults = await Promise.all(uploadPromises);
+        const imageUrls = uploadedResults.map((result) => result.imageUrl);
+        const newCloudflareIds = uploadedResults.map((result) => result.cloudflareId);
+        finalImages = [...finalImages, ...imageUrls];
+
+        // Add new Cloudflare IDs to the state
+        setCloudflareIds((prev) => [...prev, ...newCloudflareIds]);
 
         toast({
           title: "Processing Complete",
@@ -186,7 +212,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
       rating: formData.rating || undefined,
       valuation: formData.valuation ? parseFloat(formData.valuation) : undefined,
       image: finalImages[0] || undefined,
+      cloudflareId: cloudflareIds[0] || undefined,
       images: finalImages.length > 0 ? finalImages : undefined,
+      cloudflareIds: cloudflareIds.length > 0 ? cloudflareIds : undefined,
       manufacturer: formData.manufacturer || undefined,
       yearManufactured: formData.yearManufactured ? parseInt(formData.yearManufactured) : undefined,
       afaNumber: formData.afaNumber || undefined,
