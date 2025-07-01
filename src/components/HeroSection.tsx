@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Edit3, Plus, Star, Shield, Swords } from "lucide-react";
+import { Edit3, Plus } from "lucide-react";
 import { useHero } from "../contexts/HeroContext";
 import { useAuth } from "../contexts/AuthContext";
 import Image from "next/image";
