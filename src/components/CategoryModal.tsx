@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, Loader2, Trash2 } from "lucide-react";
 import { Category } from "../types";
-import { uploadImageToCloudflare } from "../services/cloudflareImages";
+import { uploadImageToCloudflare, deleteImageFromCloudflare } from "../services/cloudflareImages";
 import { useToast } from "@/hooks/use-toast";
 
 interface CategoryModalProps {
@@ -34,6 +34,9 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
   });
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [imageDeleted, setImageDeleted] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -56,11 +59,17 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
       });
       setImagePreview("");
     }
-  }, [category, parentId]);
+    setImageDeleted(false);
+  }, [category, parentId, isOpen]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Delete previous image if it exists
+    if (formData.cloudflareId) {
+      await deleteImageFromCloudflare(formData.cloudflareId);
+    }
 
     // Show preview immediately
     const reader = new FileReader();
@@ -79,7 +88,6 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
         image: imageUrl,
         cloudflareId: cloudflareId,
       }));
-
       toast({
         title: "Success",
         description: "Image uploaded successfully",
@@ -91,9 +99,19 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
     }
   };
 
-  const removeImage = () => {
-    setImagePreview("");
-    setFormData((prev) => ({ ...prev, image: "" }));
+  const handleDeleteImage = async () => {
+    setIsDeleting(true);
+    try {
+      if (formData.cloudflareId) {
+        await deleteImageFromCloudflare(formData.cloudflareId);
+      }
+      setImagePreview("");
+      setFormData((prev) => ({ ...prev, image: "", cloudflareId: "" }));
+      setImageDeleted(true);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -166,22 +184,50 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
                     alt='Category preview'
                     className='w-full h-32 object-cover rounded-lg border border-slate-600'
                   />
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setShowDeleteConfirm(true)}
+                    disabled={isUploading || isDeleting}
+                    className='absolute top-2 right-2 bg-red-600/80 border-red-500 text-white hover:bg-red-700'
+                    aria-label='Delete image'
+                  >
+                    <Trash2 className='w-4 h-4' />
+                  </Button>
+                  {showDeleteConfirm && (
+                    <div className='absolute inset-0 flex items-center justify-center bg-black/70 rounded-lg z-10'>
+                      <div className='bg-slate-800 border border-slate-600 rounded-lg p-6 max-w-xs w-full text-center'>
+                        <p className='mb-4 text-white'>
+                          You are about to delete an image. This action can not be undone. Do you wish to continue?
+                        </p>
+                        <div className='flex justify-center gap-4'>
+                          <Button
+                            type='button'
+                            variant='outline'
+                            className='bg-slate-700 border-slate-500 text-white hover:bg-slate-600'
+                            onClick={() => setShowDeleteConfirm(false)}
+                            disabled={isDeleting}
+                          >
+                            No
+                          </Button>
+                          <Button
+                            type='button'
+                            className='bg-red-600 hover:bg-red-700 text-white'
+                            onClick={handleDeleteImage}
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? <Loader2 className='w-4 h-4 animate-spin inline-block' /> : "Yes"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {isUploading && (
                     <div className='absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg'>
                       <Loader2 className='w-6 h-6 animate-spin text-blue-400' />
                     </div>
                   )}
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    onClick={removeImage}
-                    disabled={isUploading}
-                    className='absolute top-2 right-2 bg-red-600/80 border-red-500 text-white hover:bg-red-700'
-                    aria-label='Remove image'
-                  >
-                    <X className='w-4 h-4' />
-                  </Button>
                 </div>
               ) : (
                 <div className='relative'>
@@ -215,14 +261,16 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
           </div>
 
           <DialogFooter className='flex gap-2'>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={onClose}
-              className='border-slate-600 text-slate-300 hover:bg-slate-800'
-            >
-              Cancel
-            </Button>
+            {!imageDeleted && (
+              <Button
+                type='button'
+                variant='outline'
+                onClick={onClose}
+                className='bg-red-600/50 border-red-500 text-white hover:bg-red-700 hover:text-white'
+              >
+                Cancel
+              </Button>
+            )}
             <Button type='submit' disabled={isUploading} className='bg-blue-600 hover:bg-blue-700 text-white'>
               {category ? "Update" : "Create"} Category
             </Button>

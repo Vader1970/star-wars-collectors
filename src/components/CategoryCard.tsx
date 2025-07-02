@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Eye } from "lucide-react";
@@ -16,9 +17,14 @@ const CategoryCard = ({ category, onEdit, onDelete, onView, showActions = true }
   return (
     <Card className='group hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 hover:border-blue-500/50 overflow-hidden'>
       <div className='relative overflow-hidden'>
-        <img
+        <Image
           src={category.image || "/placeholder.svg"}
           alt={category.name}
+          width={450}
+          height={600}
+          quality={80}
+          priority
+          sizes='(max-width: 640px) 300px, (max-width: 768px) 300px, (max-width: 1024px) 225px, (max-width: 1280px) 200px, 150px'
           className='w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105'
         />
         <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />

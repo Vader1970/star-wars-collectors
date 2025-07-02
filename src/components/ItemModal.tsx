@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, X, Loader2 } from "lucide-react";
 import { Item } from "../types";
-import { uploadImageToCloudflare, convertBase64ToFile } from "../services/cloudflareImages";
+import { uploadImageToCloudflare, deleteImageFromCloudflare } from "../services/cloudflareImages";
 import { useToast } from "@/hooks/use-toast";
 import ManufacturerSelect from "./ManufacturerSelect";
 
@@ -41,13 +41,24 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
     variations: "",
   });
 
-  const [images, setImages] = useState<string[]>([]);
-  const [cloudflareIds, setCloudflareIds] = useState<string[]>([]);
+  const [imagePairs, setImagePairs] = useState<{ url: string; cloudflareId: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+  const [imageDeleted, setImageDeleted] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<{ show: boolean; index: number | null }>({
+    show: false,
+    index: null,
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (item) {
+      // Pair up images and cloudflareIds by index
+      const pairs = (item.images || []).map((url: string, i: number) => ({
+        url,
+        cloudflareId: (item.cloudflareIds || [])[i] || "",
+      }));
+      setImagePairs(pairs);
       setFormData({
         name: item.name || "",
         stockStatus: item.stockStatus || "In Stock",
@@ -61,25 +72,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
         boughtFor: item.boughtFor?.toString() || "",
         variations: item.variations || "",
       });
-
-      // Handle existing images - simplified without blob URL conversion
-      if (item.images && item.images.length > 0) {
-        setImages(item.images);
-      } else if (item.image) {
-        setImages([item.image]);
-      } else {
-        setImages([]);
-      }
-
-      // Handle existing Cloudflare IDs
-      if (item.cloudflareIds && item.cloudflareIds.length > 0) {
-        setCloudflareIds(item.cloudflareIds);
-      } else if (item.cloudflareId) {
-        setCloudflareIds([item.cloudflareId]);
-      } else {
-        setCloudflareIds([]);
-      }
     } else {
+      setImagePairs([]);
       setFormData({
         name: "",
         stockStatus: "In Stock",
@@ -93,18 +87,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
         boughtFor: "",
         variations: "",
       });
-      setImages([]);
-      setCloudflareIds([]);
     }
-  }, [item]);
+    setImageDeleted(false);
+    setShowDeleteConfirm({ show: false, index: null });
+    setIsDeleting(false);
+  }, [item, isOpen]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-
-    // Limit to 4 total images
-    const remainingSlots = 4 - images.length;
+    const remainingSlots = 4 - imagePairs.length;
     const filesToProcess = files.slice(0, remainingSlots);
-
     if (files.length > remainingSlots) {
       toast({
         title: "Upload Limit",
@@ -112,16 +104,13 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
         variant: "destructive",
       });
     }
-
     if (filesToProcess.length === 0) return;
-
     setUploading(true);
-
     try {
       const uploadPromises = filesToProcess.map(async (file) => {
         try {
           const { imageUrl, cloudflareId } = await uploadImageToCloudflare(file);
-          return { imageUrl, cloudflareId };
+          return { url: imageUrl, cloudflareId };
         } catch {
           toast({
             title: "Upload Error",
@@ -131,24 +120,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
           return null;
         }
       });
-
       const uploadedResults = await Promise.all(uploadPromises);
-      const successfulUploads = uploadedResults.filter((result) => result !== null) as {
-        imageUrl: string;
+      const successfulPairs = uploadedResults.filter((result) => result !== null) as {
+        url: string;
         cloudflareId: string;
       }[];
-
-      if (successfulUploads.length > 0) {
-        const imageUrls = successfulUploads.map((result) => result.imageUrl);
-        setImages((prev) => [...prev, ...imageUrls]);
-
-        // Store Cloudflare IDs for later use
-        const cloudflareIds = successfulUploads.map((result) => result.cloudflareId);
-        setCloudflareIds((prev) => [...prev, ...cloudflareIds]);
-
+      if (successfulPairs.length > 0) {
+        setImagePairs((prev) => [...prev, ...successfulPairs]);
         toast({
           title: "Upload Successful",
-          description: `${successfulUploads.length} image(s) uploaded successfully`,
+          description: `${successfulPairs.length} image(s) uploaded successfully`,
         });
       }
     } catch {
@@ -162,48 +143,28 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
     }
   };
 
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveImage = (index: number) => {
+    setShowDeleteConfirm({ show: true, index });
+  };
+
+  const confirmRemoveImage = async () => {
+    if (showDeleteConfirm.index === null) return;
+    setIsDeleting(true);
+    try {
+      const pair = imagePairs[showDeleteConfirm.index];
+      if (pair?.cloudflareId) {
+        await deleteImageFromCloudflare(pair.cloudflareId);
+      }
+      setImagePairs((prev) => prev.filter((_, i) => i !== showDeleteConfirm.index));
+      setImageDeleted(true);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm({ show: false, index: null });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Handle any remaining base64 images by uploading them to Cloudflare
-    const base64Images = images.filter((img) => img.startsWith("data:"));
-    let finalImages = images.filter((img) => !img.startsWith("data:"));
-
-    if (base64Images.length > 0) {
-      setUploading(true);
-      try {
-        const uploadPromises = base64Images.map(async (base64, index) => {
-          const file = convertBase64ToFile(base64, `${formData.name}-${index}.jpg`);
-          const { imageUrl, cloudflareId } = await uploadImageToCloudflare(file);
-          return { imageUrl, cloudflareId };
-        });
-
-        const uploadedResults = await Promise.all(uploadPromises);
-        const imageUrls = uploadedResults.map((result) => result.imageUrl);
-        const newCloudflareIds = uploadedResults.map((result) => result.cloudflareId);
-        finalImages = [...finalImages, ...imageUrls];
-
-        // Add new Cloudflare IDs to the state
-        setCloudflareIds((prev) => [...prev, ...newCloudflareIds]);
-
-        toast({
-          title: "Processing Complete",
-          description: "All images have been uploaded to cloud storage",
-        });
-      } catch {
-        toast({
-          title: "Upload Error",
-          description: "Some images failed to upload",
-          variant: "destructive",
-        });
-      } finally {
-        setUploading(false);
-      }
-    }
 
     const itemData = {
       name: formData.name,
@@ -211,10 +172,10 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
       stockStatus: formData.stockStatus,
       rating: formData.rating || undefined,
       valuation: formData.valuation ? parseFloat(formData.valuation) : undefined,
-      image: finalImages[0] || undefined,
-      cloudflareId: cloudflareIds[0] || undefined,
-      images: finalImages.length > 0 ? finalImages : undefined,
-      cloudflareIds: cloudflareIds.length > 0 ? cloudflareIds : undefined,
+      image: imagePairs[0]?.url || undefined,
+      cloudflareId: imagePairs[0]?.cloudflareId || undefined,
+      images: imagePairs.map((p) => p.url),
+      cloudflareIds: imagePairs.map((p) => p.cloudflareId),
       manufacturer: formData.manufacturer || undefined,
       yearManufactured: formData.yearManufactured ? parseInt(formData.yearManufactured) : undefined,
       afaNumber: formData.afaNumber || undefined,
@@ -432,14 +393,14 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                   id='image-upload'
                   name='images'
                   multiple
-                  disabled={images.length >= 4 || uploading}
+                  disabled={imagePairs.length >= 4 || uploading}
                 />
                 <Button
                   type='button'
                   variant='outline'
                   onClick={() => document.getElementById("image-upload")?.click()}
                   className='w-full bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100'
-                  disabled={images.length >= 4 || uploading}
+                  disabled={imagePairs.length >= 4 || uploading}
                 >
                   {uploading ? (
                     <>
@@ -449,19 +410,19 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                   ) : (
                     <>
                       <Upload className='w-4 h-4 mr-2' />
-                      {images.length >= 4 ? "Maximum 4 Images Reached" : `Upload Images (${images.length}/4)`}
+                      {imagePairs.length >= 4 ? "Maximum 4 Images Reached" : `Upload Images (${imagePairs.length}/4)`}
                     </>
                   )}
                 </Button>
               </div>
 
               {/* Image Preview Grid */}
-              {images.length > 0 && (
+              {imagePairs.length > 0 && (
                 <div className='grid grid-cols-2 sm:grid-cols-3 gap-4'>
-                  {images.map((image, index) => (
+                  {imagePairs.map((pair, index) => (
                     <div key={index} className='relative group'>
                       <img
-                        src={image}
+                        src={pair.url}
                         alt={`Preview ${index + 1}`}
                         className='w-full h-24 object-cover rounded-lg border border-gray-300'
                       />
@@ -469,7 +430,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                         type='button'
                         variant='outline'
                         size='sm'
-                        onClick={() => removeImage(index)}
+                        onClick={() => handleRemoveImage(index)}
                         className='absolute top-1 right-1 bg-red-600/90 border-red-500 text-white hover:bg-red-700 w-6 h-6 p-0'
                         disabled={uploading}
                         aria-label={`Remove image ${index + 1}`}
@@ -479,6 +440,35 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                       {index === 0 && (
                         <div className='absolute bottom-1 left-1 bg-blue-600/90 text-white text-xs px-2 py-1 rounded'>
                           Main
+                        </div>
+                      )}
+                      {/* Confirmation Dialog for Deletion */}
+                      {showDeleteConfirm.show && showDeleteConfirm.index === index && (
+                        <div className='absolute inset-0 flex items-center justify-center bg-black/70 rounded-lg z-10'>
+                          <div className='bg-white border border-gray-300 rounded-lg p-6 max-w-xs w-full text-center'>
+                            <p className='mb-4 text-black'>
+                              You are about to delete an image. This action can not be undone. Do you wish to continue?
+                            </p>
+                            <div className='flex justify-center gap-4'>
+                              <Button
+                                type='button'
+                                variant='outline'
+                                className='bg-gray-200 border-gray-400 text-black hover:bg-gray-300'
+                                onClick={() => setShowDeleteConfirm({ show: false, index: null })}
+                                disabled={isDeleting}
+                              >
+                                No
+                              </Button>
+                              <Button
+                                type='button'
+                                className='bg-red-600 hover:bg-red-700 text-white'
+                                onClick={confirmRemoveImage}
+                                disabled={isDeleting}
+                              >
+                                {isDeleting ? <Loader2 className='w-4 h-4 animate-spin inline-block' /> : "Yes"}
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -525,9 +515,11 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                 "Create Item"
               )}
             </Button>
-            <Button type='button' variant='outline' onClick={onClose} className='flex-1'>
-              Cancel
-            </Button>
+            {!imageDeleted && (
+              <Button type='button' variant='outline' onClick={onClose} className='flex-1'>
+                Cancel
+              </Button>
+            )}
           </div>
         </form>
       </DialogContent>
