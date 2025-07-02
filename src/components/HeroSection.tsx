@@ -18,9 +18,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onEditHero, onAddCategory }) 
     <div className='relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700'>
       <video
         className='absolute inset-0 w-full h-full object-cover opacity-40 z-0'
-        src='/mp4/hero-light-speed.mp4'
+        src='/mp4/space-battle.mp4'
         autoPlay
         muted
+        loop
         playsInline
       />
 
