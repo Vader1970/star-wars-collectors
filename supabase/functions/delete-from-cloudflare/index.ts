@@ -23,7 +23,9 @@ serve(async (req) => {
     }
     // Get the image ID from the request body
     const { imageId } = await req.json();
+    console.log("Received imageId for deletion:", imageId);
     if (!imageId) {
+      console.log("No imageId provided in request");
       return new Response(
         JSON.stringify({
           error: "No image ID provided",
@@ -37,6 +39,8 @@ serve(async (req) => {
         }
       );
     }
+
+    console.log("Attempting to delete image from Cloudflare:", imageId);
     // Delete from Cloudflare Images
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${imageId}`,
@@ -47,6 +51,8 @@ serve(async (req) => {
         },
       }
     );
+
+    console.log("Cloudflare API response status:", response.status);
     if (!response.ok) {
       // If the image is already deleted (404), treat as success
       if (response.status === 404) {
