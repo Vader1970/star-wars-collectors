@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCollection } from "@/contexts/CollectionContext";
 import { Search, X } from "lucide-react";
@@ -100,9 +101,11 @@ const ItemSearchDropdown: React.FC<ItemSearchDropdownProps> = ({ placeholder = "
                 className='flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0'
               >
                 {imageSrc && (
-                  <img
+                  <Image
                     src={imageSrc}
                     alt={item.name}
+                    width={32}
+                    height={32}
                     className='w-8 h-8 rounded object-cover border border-gray-200 flex-shrink-0'
                   />
                 )}

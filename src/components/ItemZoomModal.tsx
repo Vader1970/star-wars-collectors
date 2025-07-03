@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import Image from "next/image";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -74,10 +75,12 @@ const ItemZoomModal: React.FC<ItemZoomModalProps> = ({ zoomedImage, onClose }) =
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setZoomPosition({ x: 0, y: 0 })}
           >
-            <img
+            <Image
               ref={imgRef}
               src={zoomedImage.image}
               alt={zoomedImage.alt}
+              width={800}
+              height={600}
               className='object-contain border rounded-lg max-h-[75vh] max-w-[85vw] bg-white mx-auto'
               style={{
                 display: "block",
@@ -107,9 +110,11 @@ const ItemZoomModal: React.FC<ItemZoomModalProps> = ({ zoomedImage, onClose }) =
                 }}
                 className='zoom-box'
               >
-                <img
+                <Image
                   src={zoomedImage.image}
                   alt='Zoom'
+                  width={750}
+                  height={750}
                   style={{
                     position: "absolute",
                     left: -(zoomPosition.x * ZOOM_SCALE - ZOOM_BOX_SIZE / 2),

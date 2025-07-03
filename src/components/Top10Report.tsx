@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
@@ -75,9 +76,11 @@ const Top10Report: React.FC<Top10ReportProps> = ({ open, onClose }) => {
                   <TableRow key={item.id} className='even:bg-slate-50 odd:bg-white'>
                     <TableCell className='text-slate-700 text-base font-medium'>
                       {imageSrc && (
-                        <img
+                        <Image
                           src={imageSrc}
                           alt={item.name}
+                          width={40}
+                          height={40}
                           className='w-10 h-10 rounded object-cover border border-gray-200'
                         />
                       )}

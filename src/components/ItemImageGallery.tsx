@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -29,9 +30,11 @@ const ItemImageGallery: React.FC<ItemImageGalleryProps> = ({
       <Card className='sticky top-4'>
         <CardContent className='p-4'>
           <div className='relative'>
-            <img
+            <Image
               src={images[currentImageIndex]}
               alt={`${itemName} - Image ${currentImageIndex + 1}`}
+              width={600}
+              height={400}
               className='w-full h-auto rounded-lg shadow-sm cursor-zoom-in'
               onClick={() => onImageClick(images[currentImageIndex], `${itemName} - Image ${currentImageIndex + 1}`)}
             />
@@ -74,9 +77,11 @@ const ItemImageGallery: React.FC<ItemImageGalleryProps> = ({
                     index === currentImageIndex ? "border-blue-500" : "border-gray-300"
                   }`}
                 >
-                  <img
+                  <Image
                     src={image}
                     alt={`Thumbnail ${index + 1}`}
+                    width={64}
+                    height={64}
                     className='w-full h-full object-cover'
                     onClick={(e) => {
                       e.preventDefault();

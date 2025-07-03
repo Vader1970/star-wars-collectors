@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -179,9 +180,11 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
             <div className='mt-2'>
               {imagePreview ? (
                 <div className='relative'>
-                  <img
+                  <Image
                     src={imagePreview}
                     alt='Category preview'
+                    width={400}
+                    height={128}
                     className='w-full h-32 object-cover rounded-lg border border-slate-600'
                   />
                   <Button

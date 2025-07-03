@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Eye } from "lucide-react";
@@ -29,7 +30,13 @@ const ItemCard = ({ item, onEdit, onDelete, onViewDetails, showActions = true }:
       <CardContent className='p-0 flex flex-col flex-1 h-full'>
         <div className='relative'>
           {item.image ? (
-            <img src={item.image} alt={item.name} className='w-full h-48 object-cover rounded-t-lg' />
+            <Image
+              src={item.image}
+              alt={item.name}
+              width={400}
+              height={192}
+              className='w-full h-48 object-cover rounded-t-lg'
+            />
           ) : (
             <div className='w-full h-48 bg-gray-100 rounded-t-lg flex items-center justify-center'>
               <span className='text-gray-400 text-sm'>No image</span>
