@@ -103,7 +103,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
             </Label>
             <Input
               id='email'
+              name='email'
               type='email'
+              autoComplete='email'
               value={formData.email}
               onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
               className='bg-slate-800 border-slate-600 text-white'
@@ -118,7 +120,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
             </Label>
             <Input
               id='password'
+              name='password'
               type='password'
+              autoComplete='current-password'
               value={formData.password}
               onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
               className='bg-slate-800 border-slate-600 text-white'

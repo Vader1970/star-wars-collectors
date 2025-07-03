@@ -176,7 +176,9 @@ const CategoryModal = ({ isOpen, onClose, onSave, category, parentId }: Category
           </div>
 
           <div>
-            <Label className='text-slate-300'>Category Image (Optional)</Label>
+            <Label htmlFor='image-upload' className='text-slate-300'>
+              Category Image (Optional)
+            </Label>
             <div className='mt-2'>
               {imagePreview ? (
                 <div className='relative'>

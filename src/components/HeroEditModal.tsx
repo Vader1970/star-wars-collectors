@@ -85,6 +85,8 @@ const HeroEditModal: React.FC<HeroEditModalProps> = ({ isOpen, onClose }) => {
                 </Label>
                 <Input
                   id='heading1'
+                  name='heading1'
+                  autoComplete='off'
                   value={formData.heading.line1}
                   onChange={(e) => handleInputChange("heading.line1", e.target.value)}
                   placeholder='e.g. Star Wars'
@@ -97,6 +99,8 @@ const HeroEditModal: React.FC<HeroEditModalProps> = ({ isOpen, onClose }) => {
                 </Label>
                 <Input
                   id='heading2'
+                  name='heading2'
+                  autoComplete='off'
                   value={formData.heading.line2}
                   onChange={(e) => handleInputChange("heading.line2", e.target.value)}
                   placeholder='e.g. Memorabilia'
@@ -113,6 +117,8 @@ const HeroEditModal: React.FC<HeroEditModalProps> = ({ isOpen, onClose }) => {
             </Label>
             <Textarea
               id='paragraph'
+              name='paragraph'
+              autoComplete='off'
               value={formData.paragraph}
               onChange={(e) => handleInputChange("paragraph", e.target.value)}
               placeholder='Enter your hero section description...'
