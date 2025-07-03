@@ -20,6 +20,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
+      <head>
+        <link rel='preconnect' href='https://supabase.co' />
+        <link rel='preconnect' href='https://iglyuczpxkkgdemsauup.supabase.co' />
+        <link rel='dns-prefetch' href='https://supabase.co' />
+        <link rel='dns-prefetch' href='https://iglyuczpxkkgdemsauup.supabase.co' />
+      </head>
       <body className={inter.className}>
         <Providers>
           <Toaster />
