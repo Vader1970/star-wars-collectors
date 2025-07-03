@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -421,9 +422,11 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
                 <div className='grid grid-cols-2 sm:grid-cols-3 gap-4'>
                   {imagePairs.map((pair, index) => (
                     <div key={index} className='relative group'>
-                      <img
+                      <Image
                         src={pair.url}
                         alt={`Preview ${index + 1}`}
+                        width={200}
+                        height={96}
                         className='w-full h-24 object-cover rounded-lg border border-gray-300'
                       />
                       <Button
@@ -516,7 +519,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item, categoryId }: ItemModalProps
               )}
             </Button>
             {!imageDeleted && (
-              <Button type='button' variant='outline' onClick={onClose} className='flex-1'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={onClose}
+                className='flex-1 bg-red-600/80 border-red-500 text-white hover:bg-red-700 hover:text-white'
+              >
                 Cancel
               </Button>
             )}

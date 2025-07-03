@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
 import ItemBasicInfo from "@/components/ItemBasicInfo";
@@ -120,9 +121,11 @@ export default function ItemDetailsPage() {
 
           <div className='flex flex-col md:flex-row md:items-center gap-6'>
             {currentItem.image && (
-              <img
+              <Image
                 src={currentItem.image}
                 alt={currentItem.name}
+                width={128}
+                height={128}
                 className='w-32 h-32 object-cover rounded-lg border-2 border-blue-500/30'
               />
             )}
