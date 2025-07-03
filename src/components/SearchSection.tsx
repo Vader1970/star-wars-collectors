@@ -33,6 +33,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({
               </label>
               <select
                 id='category-select'
+                name='category-select'
                 className='bg-slate-800 text-white rounded px-3 py-2 text-sm w-full border border-slate-600 focus:border-blue-500 focus:outline-none'
                 value={selectedValCategory || "__placeholder__"}
                 onChange={onValCategorySelect}
