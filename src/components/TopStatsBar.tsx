@@ -1,3 +1,4 @@
+//Sign In/Out Was in top navbar, now in HeroSection. This file should be saved as SignInOut.tsx
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LogIn, LogOut, User } from "lucide-react";
