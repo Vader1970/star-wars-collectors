@@ -18,8 +18,6 @@ import { useAuth } from "../contexts/AuthContext";
 import CategoryModal from "../components/CategoryModal";
 import HeroEditModal from "../components/HeroEditModal";
 import { Category } from "../types";
-import TopStatsBar from "../components/TopStatsBar";
-import AdminSheet from "../components/AdminSheet";
 import HeroSection from "../components/HeroSection";
 import SearchSection from "../components/SearchSection";
 import CategoriesSection from "../components/CategoriesSection";
@@ -35,17 +33,10 @@ export default function HomePage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string>("");
   const [selectedValCategory, setSelectedValCategory] = useState<string>("");
-  const [adminSheetOpen, setAdminSheetOpen] = useState(false);
   const [heroEditOpen, setHeroEditOpen] = useState(false);
 
   // Only show top-level categories (no parentId)
   const topLevelCategories = categories.filter((cat) => !cat.parentId);
-
-  // "Items published" should be the number of items (NOT categories)
-  const totalPublished = items.length;
-
-  // "In stock" is the count of items with stockStatus === 'In Stock'
-  const totalInStock = items.filter((item) => item.stockStatus === "In Stock").length;
 
   // For the Group Valuation: include categories where at least one item is In Stock and has a valuation
   const groupValuationCategories = categories.filter((cat) =>
@@ -74,31 +65,35 @@ export default function HomePage() {
     setIsModalOpen(true);
   };
 
-  const handleSave = (categoryData: Omit<Category, "id" | "createdAt" | "updatedAt">) => {
+  const handleSave = async (categoryData: Omit<Category, "id" | "createdAt" | "updatedAt"> | Partial<Category>) => {
     if (editingCategory) {
-      updateCategory(editingCategory.id, categoryData);
+      await updateCategory(editingCategory.id, categoryData as Partial<Category>);
     } else {
-      addCategory(categoryData);
+      await addCategory(categoryData as Omit<Category, "id" | "createdAt" | "updatedAt">);
     }
+    setIsModalOpen(false);
     setEditingCategory(null);
   };
 
-  const handleView = (id: string) => {
-    router.push(`/category/${id}`);
-  };
-
-  const handleDeleteClick = (id: string) => {
-    setCategoryToDelete(id);
+  const handleDeleteClick = (categoryId: string) => {
+    setCategoryToDelete(categoryId);
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    deleteCategory(categoryToDelete);
-    setDeleteDialogOpen(false);
-    setCategoryToDelete("");
+  const handleDeleteConfirm = async () => {
+    if (categoryToDelete) {
+      await deleteCategory(categoryToDelete);
+      setDeleteDialogOpen(false);
+      setCategoryToDelete("");
+    }
+  };
+
+  const handleView = (categoryId: string) => {
+    router.push(`/category/${categoryId}`);
   };
 
   const handleAddCategory = () => {
+    setEditingCategory(null);
     setIsModalOpen(true);
   };
 
@@ -109,15 +104,13 @@ export default function HomePage() {
   if (heroLoading) {
     return (
       <div className='min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex items-center justify-center'>
-        <div className='text-white'>Loading...</div>
+        <div className='text-white text-xl'>Loading...</div>
       </div>
     );
   }
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-black via-slate-900 to-black'>
-      <TopStatsBar totalPublished={totalPublished} totalInStock={totalInStock} />
-
       {/* Hero Section */}
       <HeroSection onEditHero={handleEditHero} onAddCategory={handleAddCategory} />
 
@@ -157,26 +150,23 @@ export default function HomePage() {
       {/* Delete Dialog - Only render if user is authenticated */}
       {user && (
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent className='bg-slate-900 border-slate-700 text-white'>
+          <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle className='text-white'>Delete Category</AlertDialogTitle>
-              <AlertDialogDescription className='text-slate-300'>
-                Are you sure you want to delete this category? This action cannot be undone.
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the category and all its subcategories and
+                items.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className='bg-slate-800 border-slate-600 text-white hover:bg-slate-700'>
-                No
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteConfirm} className='bg-red-600 hover:bg-red-700 text-white'>
-                Yes
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteConfirm} className='bg-red-600 hover:bg-red-700'>
+                Delete
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       )}
-
-      <AdminSheet open={adminSheetOpen} onOpenChange={setAdminSheetOpen} />
     </div>
   );
 }
