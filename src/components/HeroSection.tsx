@@ -5,7 +5,7 @@ import { useHero } from "../contexts/HeroContext";
 import { useAuth } from "../contexts/AuthContext";
 import AuthModal from "./AuthModal";
 import AdminSheet from "./AdminSheet";
-import Image from "next/image";
+// import Image from "next/image";
 
 interface HeroSectionProps {
   onEditHero: () => void;
@@ -25,7 +25,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onEditHero, onAddCategory }) 
   return (
     <div className='relative h-svh overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 flex items-center justify-center'>
       <video
-        className='absolute inset-0 w-full h-full object-cover opacity-40 z-0'
+        className='absolute inset-0 w-full h-full object-cover opacity-50 z-0'
         src='/mp4/stormtrooper.mp4'
         autoPlay
         muted
@@ -50,13 +50,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onEditHero, onAddCategory }) 
 
       <div className='relative container mx-auto px-6 z-10'>
         <div className='text-center max-w-4xl mx-auto'>
-          <div className='flex justify-center mb-6'>
+          {/* <div className='flex justify-center mb-6'>
             <div className='flex items-center gap-10 sm:gap-16'>
               <Image src='/icons/imperial-star-destroyer.png' alt='Imperial Star Destroyer' width={64} height={64} />
               <Image src='/icons/death-star-2.png' alt='Death Star' width={64} height={64} />
               <Image src='/icons/imperial-tie-fighter.png' alt='TIE Fighter' width={64} height={64} />
             </div>
-          </div>
+          </div> */}
           <h1 className='text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight'>
             {heroSettings.heading.line1}
             <span className='block text-blue-400 mt-2'>{heroSettings.heading.line2}</span>
