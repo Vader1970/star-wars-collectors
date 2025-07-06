@@ -13,7 +13,7 @@ interface ItemCardProps {
   showActions?: boolean;
 }
 
-const MIN_CARD_HEIGHT = "h-[415px]"; // Adjust based on your tallest card needs.
+const MIN_CARD_HEIGHT = "h-auto"; // Adjust based on your tallest card needs.
 
 const ItemCard = ({ item, onEdit, onDelete, onViewDetails, showActions = true }: ItemCardProps) => {
   const formatCurrency = (amount: number) => {
@@ -33,9 +33,11 @@ const ItemCard = ({ item, onEdit, onDelete, onViewDetails, showActions = true }:
             <Image
               src={item.image}
               alt={item.name}
-              width={400}
-              height={192}
-              className='w-full h-48 object-cover rounded-t-lg'
+              width={450}
+              height={600}
+              priority
+              sizes='(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw'
+              className='w-full h-full object-cover rounded-t-lg'
             />
           ) : (
             <div className='w-full h-48 bg-gray-100 rounded-t-lg flex items-center justify-center'>

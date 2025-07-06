@@ -16,16 +16,15 @@ interface CategoryCardProps {
 const CategoryCard = ({ category, onEdit, onDelete, onView, showActions = true }: CategoryCardProps) => {
   return (
     <Card className='group hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 hover:border-blue-500/50 overflow-hidden'>
-      <div className='relative overflow-hidden'>
+      <div className='relative overflow-hidden h-[250px]'>
         <Image
           src={category.image || "/placeholder.svg"}
           alt={category.name}
-          width={450}
-          height={600}
+          fill
           quality={80}
           priority
           sizes='(max-width: 640px) 300px, (max-width: 768px) 300px, (max-width: 1024px) 225px, (max-width: 1280px) 200px, 150px'
-          className='w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105'
+          className='object-fit transition-transform duration-300 group-hover:scale-105'
         />
         <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
       </div>
