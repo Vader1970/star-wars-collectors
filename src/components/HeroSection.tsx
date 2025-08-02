@@ -74,7 +74,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onEditHero, onAddCategory }) 
                   <span className='hidden sm:inline'>{user.email}</span>
                 </div>
                 <Button
-                  className='bg-gray-900 hover:bg-gray-700 border border-slate-500 text-white text-sm px-4 py-2 h-auto rounded'
+                  className='bg-gray-900 hover:bg-gray-700 border border-slate-500 text-white text-sm px-4 py-2 h-auto w-[119.33px] rounded'
                   size='sm'
                   onClick={() => setAdminOpen(true)}
                   type='button'
