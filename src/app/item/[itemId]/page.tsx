@@ -92,8 +92,8 @@ export default function ItemDetailsPage() {
     currentItem.images && currentItem.images.length > 0
       ? currentItem.images
       : currentItem.image
-      ? [currentItem.image]
-      : [];
+        ? [currentItem.image]
+        : [];
 
   return (
     <div className='min-h-screen bg-slate-900'>
@@ -107,7 +107,7 @@ export default function ItemDetailsPage() {
               className='bg-slate-800 border-slate-600 text-white hover:bg-slate-700'
             >
               <ArrowLeft className='w-4 h-4 mr-2' />
-              Back to Category
+              Back
             </Button>
             <Button
               variant='outline'
