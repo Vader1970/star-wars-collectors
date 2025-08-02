@@ -87,7 +87,7 @@ const CategoryValuationReport: React.FC<CategoryValuationReportProps> = ({ open,
                   <TableCell className='text-slate-800 text-base'>
                     <button
                       onClick={() => handleCategoryClick(id)}
-                      className='text-blue-600 hover:text-blue-800 underline cursor-pointer font-medium print:text-slate-800 print:no-underline'
+                      className='text-left text-blue-600 hover:text-blue-800 underline cursor-pointer font-medium print:text-slate-800 print:no-underline'
                     >
                       {name}
                     </button>
