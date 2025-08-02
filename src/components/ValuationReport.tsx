@@ -177,7 +177,7 @@ const ValuationReport: React.FC<ValuationReportProps> = ({ open, onClose }) => {
                         <TableCell className='text-slate-800 text-base'>
                           <button
                             onClick={() => handleItemClick(item.id)}
-                            className='text-blue-600 hover:text-blue-800 underline cursor-pointer font-medium print:text-slate-800 print:no-underline'
+                            className='text-left text-blue-600 hover:text-blue-800 underline cursor-pointer font-medium print:text-slate-800 print:no-underline'
                           >
                             {item.name}
                           </button>
@@ -189,16 +189,14 @@ const ValuationReport: React.FC<ValuationReportProps> = ({ open, onClose }) => {
                           {formatCurrency(item.valuation)}
                         </TableCell>
                         <TableCell
-                          className={`text-right text-base font-medium ${
-                            item.profit >= 0 ? "text-green-600" : "text-red-600"
-                          }`}
+                          className={`text-right text-base font-medium ${item.profit >= 0 ? "text-green-600" : "text-red-600"
+                            }`}
                         >
                           {formatCurrency(item.profit)}
                         </TableCell>
                         <TableCell
-                          className={`text-right text-base font-bold ${
-                            item.profitPercentage >= 0 ? "text-green-600" : "text-red-600"
-                          }`}
+                          className={`text-right text-base font-bold ${item.profitPercentage >= 0 ? "text-green-600" : "text-red-600"
+                            }`}
                         >
                           {formatPercentage(item.profitPercentage)}
                         </TableCell>

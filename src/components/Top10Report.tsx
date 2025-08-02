@@ -88,7 +88,7 @@ const Top10Report: React.FC<Top10ReportProps> = ({ open, onClose }) => {
                     <TableCell className='text-slate-800 text-base'>
                       <button
                         onClick={() => handleItemClick(item.id)}
-                        className='text-blue-600 hover:text-blue-800 underline cursor-pointer font-medium print:text-slate-800 print:no-underline'
+                        className='text-left text-blue-600 hover:text-blue-800 underline cursor-pointer font-medium print:text-slate-800 print:no-underline'
                       >
                         {item.name}
                       </button>
