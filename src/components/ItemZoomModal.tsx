@@ -4,8 +4,8 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { X } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-const ZOOM_BOX_SIZE = 300;
-const ZOOM_SCALE = 2.5;
+const ZOOM_BOX_SIZE = 400;
+const ZOOM_SCALE = 4.5;
 
 interface ItemZoomModalProps {
   zoomedImage: { image: string; alt: string } | null;
@@ -28,18 +28,19 @@ const ItemZoomModal: React.FC<ItemZoomModalProps> = ({ zoomedImage, onClose }) =
   return (
     <Dialog open={!!zoomedImage} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className='max-w-5xl w-full bg-background relative overflow-visible p-0 flex justify-center items-center'
+        className='max-w-5xl bg-background relative overflow-visible p-0 flex justify-center items-center'
         style={{
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
           position: "fixed",
-          maxHeight: "95vh",
-          maxWidth: "95vw",
+          height: "100vh",
+          width: "100vw",
           overflow: "hidden",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          gap: "0",
         }}
       >
         <DialogTitle>
@@ -59,7 +60,7 @@ const ItemZoomModal: React.FC<ItemZoomModalProps> = ({ zoomedImage, onClose }) =
           <div
             className='relative flex justify-center items-center bg-white rounded-xl shadow-lg'
             style={{
-              padding: "2rem",
+              padding: "0",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -71,6 +72,7 @@ const ItemZoomModal: React.FC<ItemZoomModalProps> = ({ zoomedImage, onClose }) =
               margin: 0,
               maxWidth: "100%",
               maxHeight: "100%",
+              cursor: "none",
             }}
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setZoomPosition({ x: 0, y: 0 })}
@@ -79,15 +81,17 @@ const ItemZoomModal: React.FC<ItemZoomModalProps> = ({ zoomedImage, onClose }) =
               ref={imgRef}
               src={zoomedImage.image}
               alt={zoomedImage.alt}
-              width={800}
-              height={600}
-              className='object-contain border rounded-lg max-h-[75vh] max-w-[85vw] bg-white mx-auto'
+              width={4000}
+              height={4000}
+              className='object-contain rounded-lg bg-white'
               style={{
                 display: "block",
                 background: "#fff",
-                margin: "0",
-                maxHeight: "70vh",
+                margin: "0 auto",
+                maxHeight: "85vh",
                 maxWidth: "95vw",
+                width: "auto",
+                height: "auto",
               }}
               draggable={false}
             />
@@ -110,6 +114,23 @@ const ItemZoomModal: React.FC<ItemZoomModalProps> = ({ zoomedImage, onClose }) =
                 }}
                 className='zoom-box'
               >
+                {/* Custom cursor in center of zoom box */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "8px",
+                    height: "8px",
+                    backgroundColor: "#3182ce",
+                    borderRadius: "50%",
+                    zIndex: 21,
+                    pointerEvents: "none",
+                    border: "2px solid white",
+                    boxShadow: "0 0 4px rgba(0,0,0,0.5)",
+                  }}
+                />
                 <Image
                   src={zoomedImage.image}
                   alt='Zoom'
